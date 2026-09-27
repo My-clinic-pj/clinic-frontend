@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:4030/api',
+  baseURL: 'https://clinic-backend-amber.vercel.app/api',
 });
 
 api.interceptors.request.use((config) => {
