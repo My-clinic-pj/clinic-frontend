@@ -1,0 +1,6 @@
+{
+  "name": "Clinic Patient Management System",
+  "description": "Offline-first clinic patient and visit management system for clinic administration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
