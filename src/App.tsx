@@ -39,7 +39,7 @@ import { AddPatientModal } from './components/AddPatientModal';
 
 function DashboardView() {
   const { patients, loading, error, fetchPatients, addPatient, updatePatient } = usePatients();
-  const { clinicId } = useAuth();
+  const { userId } = useAuth();
   const [search, setSearch] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   
@@ -48,9 +48,9 @@ function DashboardView() {
   const [selectedPatientForCheckout, setSelectedPatientForCheckout] = useState<PatientRecord | null>(null);
 
   useEffect(() => {
-    if (clinicId) fetchPatients(clinicId);
+    if (userId) fetchPatients(userId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clinicId]);
+  }, [userId]);
 
   // Derive separated lists
   const todayStr = new Date().toDateString();
@@ -267,7 +267,7 @@ function DashboardView() {
             setSelectedPatientForCheckout(null);
           }} 
           onSubmit={updatePatient}
-          onSuccess={async () => { if (clinicId) await fetchPatients(clinicId); }}
+          onSuccess={async () => { if (userId) await fetchPatients(userId); }}
         />
       )}
     </div>

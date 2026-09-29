@@ -11,7 +11,7 @@ export interface PatientPayload {
   age: number;
   address?: string;
   allergies?: string;
-  clinicId: string;
+  userId: string;
   status?: 'Checking' | 'Completed';
   vitals?: {
     bloodPressure: string;
@@ -68,14 +68,14 @@ export const usePatients = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  /** GET /patients/clinic/:clinicId */
-  const fetchPatients = useCallback(async (clinicId: string) => {
+  /** GET /patients/doctor/:userId */
+  const fetchPatients = useCallback(async (userId: string) => {
     setLoading(true);
     setError(null);
     try {
       const response = await api({
         method: 'get',
-        url: `/patients/clinic/${clinicId}`,
+        url: `/patients/doctor/${userId}`,
       });
       const data = (response.data as ApiResponse<PatientRecord[]>).data;
       setPatients(data);
@@ -98,7 +98,7 @@ export const usePatients = () => {
       // Re-fetch to get the real MongoDB _id
       const refreshed = await api({
         method: 'get',
-        url: `/patients/clinic/${payload.clinicId}`,
+        url: `/patients/doctor/${payload.userId}`,
       });
       const freshList = (refreshed.data as ApiResponse<PatientRecord[]>).data;
       setPatients(freshList);

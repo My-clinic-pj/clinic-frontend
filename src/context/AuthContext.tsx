@@ -4,10 +4,10 @@ import api from '../lib/api';
 interface AuthContextType {
   token: string | null;
   username: string | null;
-  clinicId: string | null;
+  userId: string | null;
   globalClinicName: string;
   setGlobalClinicName: (name: string) => void;
-  login: (token: string, username: string, clinicId: string) => void;
+  login: (token: string, username: string, userId: string) => void;
   logout: () => void;
 }
 
@@ -16,7 +16,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
   const [username, setUsername] = useState<string | null>(localStorage.getItem('username'));
-  const [clinicId, setClinicId] = useState<string | null>(localStorage.getItem('clinicId'));
+  const [userId, setUserId] = useState<string | null>(localStorage.getItem('userId'));
   const [globalClinicName, setGlobalClinicName] = useState('My Clinic');
 
   useEffect(() => {
@@ -35,26 +35,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [token]);
 
-  const login = (newToken: string, newUsername: string, newClinicId: string) => {
+  const login = (newToken: string, newUsername: string, newUserId: string) => {
     setToken(newToken);
     setUsername(newUsername);
-    setClinicId(newClinicId);
+    setUserId(newUserId);
     localStorage.setItem('token', newToken);
     localStorage.setItem('username', newUsername);
-    localStorage.setItem('clinicId', newClinicId);
+    localStorage.setItem('userId', newUserId);
   };
 
   const logout = () => {
     setToken(null);
     setUsername(null);
-    setClinicId(null);
+    setUserId(null);
     localStorage.removeItem('token');
     localStorage.removeItem('username');
-    localStorage.removeItem('clinicId');
+    localStorage.removeItem('userId');
   };
 
   return (
-    <AuthContext.Provider value={{ token, username, clinicId, globalClinicName, setGlobalClinicName, login, logout }}>
+    <AuthContext.Provider value={{ token, username, userId, globalClinicName, setGlobalClinicName, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

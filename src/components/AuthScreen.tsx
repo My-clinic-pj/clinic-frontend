@@ -26,10 +26,10 @@ export default function AuthScreen() {
       
       const token = response.data?.data?.token || response.data?.token;
       const username = response.data?.data?.username || response.data?.username || 'User';
-      const clinicId = response.data?.data?.clinicId || response.data?.clinicId;
+      const userId = response.data?.data?._id || response.data?.data?.id || response.data?.data?.userId || response.data?._id || response.data?.id || response.data?.userId;
       
       if (token) {
-        login(token, username, clinicId);
+        login(token, username, userId);
       } else {
         console.log('Backend response:', response.data);
         throw new Error('No token received from server');

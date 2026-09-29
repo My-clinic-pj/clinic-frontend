@@ -136,7 +136,7 @@ function PatientProfileModal({ patient, onClose, onCheckOut }: PatientProfileMod
 
 export default function Patients() {
   const { patients, loading, fetchPatients, updatePatient } = usePatients();
-  const { clinicId } = useAuth();
+  const { userId } = useAuth();
   
   const [search, setSearch] = useState('');
   const [dateFilter, setDateFilter] = useState(new Date().toISOString().split('T')[0]);
@@ -156,9 +156,9 @@ export default function Patients() {
   };
 
   useEffect(() => {
-    if (clinicId) fetchPatients(clinicId);
+    if (userId) fetchPatients(userId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clinicId]);
+  }, [userId]);
 
   const filteredPatients = useMemo(() => {
     return patients.filter((p) => {
@@ -323,7 +323,7 @@ export default function Patients() {
           patient={patientForCheckout}
           onClose={() => setIsCheckoutModalOpen(false)}
           onSubmit={updatePatient}
-          onSuccess={async () => { if (clinicId) await fetchPatients(clinicId); }}
+          onSuccess={async () => { if (userId) await fetchPatients(userId); }}
         />
       )}
 
@@ -334,7 +334,7 @@ export default function Patients() {
           loading={loading}
           onSubmit={async (payload) => {
             await updatePatient(checkinPatient._id, payload);
-            if (clinicId) fetchPatients(clinicId);
+            if (userId) fetchPatients(userId);
           }}
         />
       )}
