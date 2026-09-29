@@ -26,7 +26,7 @@ export default function AuthScreen() {
       
       const token = response.data?.data?.token || response.data?.token;
       const username = response.data?.data?.username || response.data?.username || 'User';
-      const userId = response.data?.data?._id || response.data?.data?.id || response.data?.data?.userId || response.data?._id || response.data?.id || response.data?.userId;
+      const userId = response.data?.data?._id || response.data?.data?.id || response.data?.data?.userId || response.data?.data?.user?._id || response.data?.data?.user?.id || response.data?._id || response.data?.id || response.data?.userId || response.data?.user?._id || response.data?.user?.id;
       
       if (token) {
         login(token, username, userId);
