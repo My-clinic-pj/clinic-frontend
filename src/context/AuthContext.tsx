@@ -4,9 +4,10 @@ import api from '../lib/api';
 interface AuthContextType {
   token: string | null;
   username: string | null;
+  clinicId: string | null;
   globalClinicName: string;
   setGlobalClinicName: (name: string) => void;
-  login: (token: string, username: string) => void;
+  login: (token: string, username: string, clinicId: string) => void;
   logout: () => void;
 }
 
@@ -15,6 +16,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
   const [username, setUsername] = useState<string | null>(localStorage.getItem('username'));
+  const [clinicId, setClinicId] = useState<string | null>(localStorage.getItem('clinicId'));
   const [globalClinicName, setGlobalClinicName] = useState('My Clinic');
 
   useEffect(() => {
@@ -33,22 +35,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [token]);
 
-  const login = (newToken: string, newUsername: string) => {
+  const login = (newToken: string, newUsername: string, newClinicId: string) => {
     setToken(newToken);
     setUsername(newUsername);
+    setClinicId(newClinicId);
     localStorage.setItem('token', newToken);
     localStorage.setItem('username', newUsername);
+    localStorage.setItem('clinicId', newClinicId);
   };
 
   const logout = () => {
     setToken(null);
     setUsername(null);
+    setClinicId(null);
     localStorage.removeItem('token');
     localStorage.removeItem('username');
+    localStorage.removeItem('clinicId');
   };
 
   return (
-    <AuthContext.Provider value={{ token, username, globalClinicName, setGlobalClinicName, login, logout }}>
+    <AuthContext.Provider value={{ token, username, clinicId, globalClinicName, setGlobalClinicName, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { usePatients } from '../hooks/usePatients';
+import { useAuth } from '../context/AuthContext';
 import { Download, ChevronLeft, ChevronRight, TrendingUp, Users, DollarSign, Activity, Loader2, PieChart, Calendar } from 'lucide-react';
 import {
   LineChart,
@@ -14,7 +15,7 @@ import {
 import * as htmlToImage from 'html-to-image';
 import { jsPDF } from 'jspdf';
 
-const DEFAULT_CLINIC_ID = '6ab5ee4e04d787fb8194e8f8';
+
 
 // Helper to format Date to YYYY-MM-DD for input value
 const formatDateString = (date: Date) => {
@@ -23,6 +24,7 @@ const formatDateString = (date: Date) => {
 
 export default function Reports() {
   const { patients, loading, fetchPatients } = usePatients();
+  const { clinicId } = useAuth();
   const reportRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -30,9 +32,9 @@ export default function Reports() {
   const [selectedDate, setSelectedDate] = useState(formatDateString(new Date()));
 
   useEffect(() => {
-    fetchPatients(DEFAULT_CLINIC_ID);
+    if (clinicId) fetchPatients(clinicId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [clinicId]);
 
   // --- Handlers for Date Navigation ---
   const handlePrevDay = () => {

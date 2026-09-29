@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { usePatients, PatientRecord } from '../hooks/usePatients';
+import { useAuth } from '../context/AuthContext';
 import { CheckoutModal } from '../components/CheckoutModalComponent';
 import { AddPatientModal } from '../components/AddPatientModal';
 import { Search, Loader2, Users, X, Activity, DollarSign, Calendar } from 'lucide-react';
 
-const DEFAULT_CLINIC_ID = '6ab5ee4e04d787fb8194e8f8';
+
 const ITEMS_PER_PAGE = 10;
 
 interface PatientProfileModalProps {
@@ -135,6 +136,7 @@ function PatientProfileModal({ patient, onClose, onCheckOut }: PatientProfileMod
 
 export default function Patients() {
   const { patients, loading, fetchPatients, updatePatient } = usePatients();
+  const { clinicId } = useAuth();
   
   const [search, setSearch] = useState('');
   const [dateFilter, setDateFilter] = useState(new Date().toISOString().split('T')[0]);
@@ -154,9 +156,9 @@ export default function Patients() {
   };
 
   useEffect(() => {
-    fetchPatients(DEFAULT_CLINIC_ID);
+    if (clinicId) fetchPatients(clinicId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [clinicId]);
 
   const filteredPatients = useMemo(() => {
     return patients.filter((p) => {
@@ -321,7 +323,7 @@ export default function Patients() {
           patient={patientForCheckout}
           onClose={() => setIsCheckoutModalOpen(false)}
           onSubmit={updatePatient}
-          onSuccess={() => fetchPatients(DEFAULT_CLINIC_ID)}
+          onSuccess={async () => { if (clinicId) await fetchPatients(clinicId); }}
         />
       )}
 
@@ -332,7 +334,7 @@ export default function Patients() {
           loading={loading}
           onSubmit={async (payload) => {
             await updatePatient(checkinPatient._id, payload);
-            fetchPatients(DEFAULT_CLINIC_ID);
+            if (clinicId) fetchPatients(clinicId);
           }}
         />
       )}
