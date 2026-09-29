@@ -13,7 +13,7 @@ export interface AddPatientModalProps {
 }
 
 export function AddPatientModal({ onClose, onSubmit, loading, existingPatient }: AddPatientModalProps) {
-  const { clinicId } = useAuth();
+  const { userId } = useAuth();
   const [form, setForm] = useState({
     name: '',
     phone: '',
@@ -46,7 +46,7 @@ export function AddPatientModal({ onClose, onSubmit, loading, existingPatient }:
       payload.age = Number(form.age);
       payload.address = form.address.trim();
       payload.allergies = form.allergies.trim();
-      payload.clinicId = clinicId || '';
+      payload.userId = userId || '';
     }
 
     await onSubmit(payload);
