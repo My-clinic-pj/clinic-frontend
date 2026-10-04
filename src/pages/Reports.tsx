@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { usePatients } from '../hooks/usePatients';
-import { useUser } from '@clerk/clerk-react';
+import { useAuth } from '../context/AuthContext';
 import { Download, ChevronLeft, ChevronRight, TrendingUp, Users, DollarSign, Activity, Loader2, PieChart, Calendar } from 'lucide-react';
 import {
   LineChart,
@@ -24,7 +24,8 @@ const formatDateString = (date: Date) => {
 
 export default function Reports() {
   const { patients, loading, fetchPatients } = usePatients();
-  const { user, isLoaded } = useUser();
+  const { userId: ctxUserId } = useAuth();
+  const userId = ctxUserId || localStorage.getItem('userId');
   const reportRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -32,17 +33,9 @@ export default function Reports() {
   const [selectedDate, setSelectedDate] = useState(formatDateString(new Date()));
 
   useEffect(() => {
-    if (user?.id) fetchPatients(user.id);
+    if (userId) fetchPatients(userId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
-
-  if (!isLoaded) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-      </div>
-    );
-  }
+  }, [userId]);
 
   // --- Handlers for Date Navigation ---
   const handlePrevDay = () => {

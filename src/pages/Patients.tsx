@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { usePatients, PatientRecord } from '../hooks/usePatients';
-import { useUser } from '@clerk/clerk-react';
+import { useAuth } from '../context/AuthContext';
 import { CheckoutModal } from '../components/CheckoutModalComponent';
 import { AddPatientModal } from '../components/AddPatientModal';
 import { Search, Loader2, Users, X, Activity, DollarSign, Calendar } from 'lucide-react';
@@ -136,7 +136,7 @@ function PatientProfileModal({ patient, onClose, onCheckOut }: PatientProfileMod
 
 export default function Patients() {
   const { patients, loading, fetchPatients, updatePatient } = usePatients();
-  const { user, isLoaded } = useUser();
+  const { userId } = useAuth();
   
   const [search, setSearch] = useState('');
   const [dateFilter, setDateFilter] = useState(new Date().toISOString().split('T')[0]);
@@ -156,17 +156,9 @@ export default function Patients() {
   };
 
   useEffect(() => {
-    if (user?.id) fetchPatients(user.id);
+    if (userId) fetchPatients(userId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
-
-  if (!isLoaded) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-      </div>
-    );
-  }
+  }, [userId]);
 
   const filteredPatients = useMemo(() => {
     return patients.filter((p) => {
@@ -331,7 +323,7 @@ export default function Patients() {
           patient={patientForCheckout}
           onClose={() => setIsCheckoutModalOpen(false)}
           onSubmit={updatePatient}
-          onSuccess={async () => { if (user?.id) await fetchPatients(user.id); }}
+          onSuccess={async () => { if (userId) await fetchPatients(userId); }}
         />
       )}
 
@@ -342,7 +334,7 @@ export default function Patients() {
           loading={loading}
           onSubmit={async (payload) => {
             await updatePatient(checkinPatient._id, payload);
-            if (user?.id) fetchPatients(user.id);
+            if (userId) fetchPatients(userId);
           }}
         />
       )}
