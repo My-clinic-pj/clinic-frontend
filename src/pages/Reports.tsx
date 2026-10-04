@@ -24,7 +24,7 @@ const formatDateString = (date: Date) => {
 
 export default function Reports() {
   const { patients, loading, fetchPatients } = usePatients();
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const reportRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -35,6 +35,14 @@ export default function Reports() {
     if (user?.id) fetchPatients(user.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
+
+  if (!isLoaded) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+      </div>
+    );
+  }
 
   // --- Handlers for Date Navigation ---
   const handlePrevDay = () => {

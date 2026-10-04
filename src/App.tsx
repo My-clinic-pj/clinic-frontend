@@ -256,7 +256,7 @@ function CheckoutModal({ patient, onClose, onSubmit, onSuccess }: CheckoutModalP
 }
 
 function DashboardView() {
-  const { user } = useUser();
+  const { user, isLoaded, isSignedIn } = useUser();
   const { patients, loading, error, fetchPatients, addPatient, updatePatient } = usePatients();
   const [search, setSearch] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -271,6 +271,14 @@ function DashboardView() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
+
+  if (!isLoaded || !isSignedIn || !user) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+      </div>
+    );
+  }
 
   // Derive separated lists
   const checkingPatients = patients.filter(p => !p.status || p.status === 'Checking');

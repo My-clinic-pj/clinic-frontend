@@ -13,7 +13,7 @@ export interface AddPatientModalProps {
 }
 
 export function AddPatientModal({ onClose, onSubmit, loading, existingPatient }: AddPatientModalProps) {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const [form, setForm] = useState({
     name: '',
     phone: '',
@@ -33,6 +33,8 @@ export function AddPatientModal({ onClose, onSubmit, loading, existingPatient }:
       });
     }
   }, [existingPatient]);
+
+  if (!isLoaded) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -136,7 +136,7 @@ function PatientProfileModal({ patient, onClose, onCheckOut }: PatientProfileMod
 
 export default function Patients() {
   const { patients, loading, fetchPatients, updatePatient } = usePatients();
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   
   const [search, setSearch] = useState('');
   const [dateFilter, setDateFilter] = useState(new Date().toISOString().split('T')[0]);
@@ -159,6 +159,14 @@ export default function Patients() {
     if (user?.id) fetchPatients(user.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
+
+  if (!isLoaded) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+      </div>
+    );
+  }
 
   const filteredPatients = useMemo(() => {
     return patients.filter((p) => {
