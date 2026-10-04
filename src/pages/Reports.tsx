@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { usePatients } from '../hooks/usePatients';
-import { useAuth } from '../context/AuthContext';
+import { useUser } from '@clerk/clerk-react';
 import { Download, ChevronLeft, ChevronRight, TrendingUp, Users, DollarSign, Activity, Loader2, PieChart, Calendar } from 'lucide-react';
 import {
   LineChart,
@@ -24,7 +24,7 @@ const formatDateString = (date: Date) => {
 
 export default function Reports() {
   const { patients, loading, fetchPatients } = usePatients();
-  const { clinicId } = useAuth();
+  const { user } = useUser();
   const reportRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -32,9 +32,9 @@ export default function Reports() {
   const [selectedDate, setSelectedDate] = useState(formatDateString(new Date()));
 
   useEffect(() => {
-    if (clinicId) fetchPatients(clinicId);
+    if (user?.id) fetchPatients(user.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clinicId]);
+  }, [user?.id]);
 
   // --- Handlers for Date Navigation ---
   const handlePrevDay = () => {

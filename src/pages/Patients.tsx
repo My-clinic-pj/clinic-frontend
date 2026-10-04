@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { usePatients, PatientRecord } from '../hooks/usePatients';
-import { useAuth } from '../context/AuthContext';
+import { useUser } from '@clerk/clerk-react';
 import { CheckoutModal } from '../components/CheckoutModalComponent';
 import { AddPatientModal } from '../components/AddPatientModal';
 import { Search, Loader2, Users, X, Activity, DollarSign, Calendar } from 'lucide-react';
@@ -136,7 +136,7 @@ function PatientProfileModal({ patient, onClose, onCheckOut }: PatientProfileMod
 
 export default function Patients() {
   const { patients, loading, fetchPatients, updatePatient } = usePatients();
-  const { userId } = useAuth();
+  const { user } = useUser();
   
   const [search, setSearch] = useState('');
   const [dateFilter, setDateFilter] = useState(new Date().toISOString().split('T')[0]);
@@ -156,9 +156,9 @@ export default function Patients() {
   };
 
   useEffect(() => {
-    if (userId) fetchPatients(userId);
+    if (user?.id) fetchPatients(user.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
+  }, [user?.id]);
 
   const filteredPatients = useMemo(() => {
     return patients.filter((p) => {
@@ -323,7 +323,7 @@ export default function Patients() {
           patient={patientForCheckout}
           onClose={() => setIsCheckoutModalOpen(false)}
           onSubmit={updatePatient}
-          onSuccess={async () => { if (userId) await fetchPatients(userId); }}
+          onSuccess={async () => { if (user?.id) await fetchPatients(user.id); }}
         />
       )}
 
@@ -334,7 +334,7 @@ export default function Patients() {
           loading={loading}
           onSubmit={async (payload) => {
             await updatePatient(checkinPatient._id, payload);
-            if (userId) fetchPatients(userId);
+            if (user?.id) fetchPatients(user.id);
           }}
         />
       )}

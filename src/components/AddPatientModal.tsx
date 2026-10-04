@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Loader2 } from 'lucide-react';
 import type { PatientPayload, PatientRecord } from '../hooks/usePatients';
-import { useAuth } from '../context/AuthContext';
+import { useUser } from '@clerk/clerk-react';
 
 
 
@@ -13,7 +13,7 @@ export interface AddPatientModalProps {
 }
 
 export function AddPatientModal({ onClose, onSubmit, loading, existingPatient }: AddPatientModalProps) {
-  const { userId } = useAuth();
+  const { user } = useUser();
   const [form, setForm] = useState({
     name: '',
     phone: '',
@@ -46,7 +46,7 @@ export function AddPatientModal({ onClose, onSubmit, loading, existingPatient }:
       payload.age = Number(form.age);
       payload.address = form.address.trim();
       payload.allergies = form.allergies.trim();
-      payload.userId = userId || '';
+      payload.userId = user?.id || '';
     }
 
     await onSubmit(payload);
