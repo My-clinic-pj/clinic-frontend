@@ -3,6 +3,7 @@ import SignatureCanvas from 'react-signature-canvas';
 import { LogOut, Save, Loader2, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../lib/api';
+import { DEFAULT_CLINIC_NAME, DEFAULT_CLINIC_ADDRESS } from '../lib/defaults';
 
 export default function Settings() {
   const { logout, setGlobalClinicName } = useAuth();
@@ -11,11 +12,14 @@ export default function Settings() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   
   const [form, setForm] = useState({
-    clinicName: '',
-    address: '',
+    clinicName: DEFAULT_CLINIC_NAME,
+    address: DEFAULT_CLINIC_ADDRESS,
   });
   
   const sigCanvasRef = useRef<SignatureCanvas>(null);
+  // Saved signature from the backend. Kept in state because the canvas isn't
+  // mounted yet while the loading spinner is shown.
+  const [savedSignature, setSavedSignature] = useState('');
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -23,12 +27,10 @@ export default function Settings() {
         const { data } = await api.get('/settings');
         if (data.success && data.data) {
           setForm({
-            clinicName: data.data.clinicName || '',
-            address: data.data.address || '',
+            clinicName: data.data.clinicName || DEFAULT_CLINIC_NAME,
+            address: data.data.address ?? DEFAULT_CLINIC_ADDRESS,
           });
-          if (data.data.signature && sigCanvasRef.current) {
-            sigCanvasRef.current.fromDataURL(data.data.signature);
-          }
+          setSavedSignature(data.data.signature || '');
         }
       } catch (error) {
         console.error("Failed to fetch settings", error);
@@ -39,10 +41,68 @@ export default function Settings() {
     fetchSettings();
   }, []);
 
+  // Draw the saved signature only once loading has finished and the canvas
+  // is mounted in the DOM with real layout dimensions.
+  useEffect(() => {
+    if (fetching || !savedSignature) return;
+
+    let cancelled = false;
+    let frameId = 0;
+    let attempts = 0;
+    const MAX_ATTEMPTS = 60; // ~1s of animation frames
+
+    const draw = () => {
+      if (cancelled) return;
+      const pad = sigCanvasRef.current;
+      const canvas = pad?.getCanvas();
+
+      // Wait until the canvas exists and has been laid out
+      if (!pad || !canvas || canvas.offsetWidth === 0 || canvas.offsetHeight === 0) {
+        if (++attempts < MAX_ATTEMPTS) frameId = requestAnimationFrame(draw);
+        return;
+      }
+
+      const img = new Image();
+      img.onload = () => {
+        if (cancelled || !sigCanvasRef.current) return;
+        // Keep the aspect ratio and fit it inside the box. The trimmed PNG was
+        // captured at devicePixelRatio, so convert it back to CSS pixels first.
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        const naturalW = img.naturalWidth / ratio;
+        const naturalH = img.naturalHeight / ratio;
+        const scale = Math.min(1, canvas.offsetWidth / naturalW, canvas.offsetHeight / naturalH);
+        sigCanvasRef.current.fromDataURL(savedSignature, {
+          width: naturalW * scale,
+          height: naturalH * scale,
+        });
+      };
+      img.src = savedSignature;
+    };
+
+    frameId = requestAnimationFrame(draw);
+
+    // react-signature-canvas clears the canvas on window resize, which would
+    // otherwise make Save wipe the stored signature. Redraw it afterwards.
+    const handleResize = () => {
+      cancelAnimationFrame(frameId);
+      attempts = 0;
+      frameId = requestAnimationFrame(draw);
+    };
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(frameId);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [fetching, savedSignature]);
+
   const clearSignature = () => {
     if (sigCanvasRef.current) {
       sigCanvasRef.current.clear();
     }
+    // Stop the resize handler from bringing back a signature the user cleared
+    setSavedSignature('');
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -61,6 +121,7 @@ export default function Settings() {
       const { data } = await api.post('/settings', payload);
       if (data.success) {
         setGlobalClinicName(form.clinicName);
+        setSavedSignature(signatureDataUrl || '');
         alert("Settings saved successfully!");
       }
     } catch (error) {

@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react';
+import { DEFAULT_CLINIC_NAME, DEFAULT_CLINIC_ADDRESS } from '../lib/defaults';
 
 export function useSettings() {
-  const [clinicName, setClinicName] = useState(() => localStorage.getItem('clinicName') || 'My Clinic');
+  const [clinicName, setClinicName] = useState(() => localStorage.getItem('clinicName') || DEFAULT_CLINIC_NAME);
   const [doctorName, setDoctorName] = useState(() => localStorage.getItem('doctorName') || '');
-  const [clinicAddress, setClinicAddress] = useState(() => localStorage.getItem('clinicAddress') || '');
+  const [clinicAddress, setClinicAddress] = useState(() => localStorage.getItem('clinicAddress') || DEFAULT_CLINIC_ADDRESS);
   const [clinicPhone, setClinicPhone] = useState(() => localStorage.getItem('clinicPhone') || '');
   const [doctorSignature, setDoctorSignature] = useState(() => localStorage.getItem('doctorSignature') || '');
 
   useEffect(() => {
     const handleStorageChange = () => {
-      setClinicName(localStorage.getItem('clinicName') || 'My Clinic');
+      setClinicName(localStorage.getItem('clinicName') || DEFAULT_CLINIC_NAME);
       setDoctorName(localStorage.getItem('doctorName') || '');
-      setClinicAddress(localStorage.getItem('clinicAddress') || '');
+      setClinicAddress(localStorage.getItem('clinicAddress') || DEFAULT_CLINIC_ADDRESS);
       setClinicPhone(localStorage.getItem('clinicPhone') || '');
       setDoctorSignature(localStorage.getItem('doctorSignature') || '');
     };

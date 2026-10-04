@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import SignatureCanvas from 'react-signature-canvas';
 import { useSettings } from '../hooks/useSettings';
+import { DEFAULT_CLINIC_NAME } from '../lib/defaults';
 import {
   exportDatabaseToJson,
   importDatabaseFromJson,
@@ -40,7 +41,7 @@ export const SettingsPage: React.FC = () => {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    const trimmedClinic = localClinicName.trim() || 'My Clinic';
+    const trimmedClinic = localClinicName.trim() || DEFAULT_CLINIC_NAME;
     const trimmedDoctor = localDoctorName.trim();
     const trimmedAddress = localClinicAddress.trim();
     const trimmedPhone = localClinicPhone.trim();
