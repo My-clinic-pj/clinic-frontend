@@ -36,7 +36,7 @@ function PatientProfileModal({ patient, onClose, onCheckOut }: PatientProfileMod
           </button>
         </div>
 
-        <div className="p-6 space-y-8 max-h-[70vh] overflow-y-auto">
+        <div className="p-4 sm:p-6 space-y-8 max-h-[70vh] overflow-y-auto min-w-0">
           {/* Details Section */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-4 rounded-md border border-gray-200 bg-white">
@@ -85,8 +85,8 @@ function PatientProfileModal({ patient, onClose, onCheckOut }: PatientProfileMod
                 No completed visit history found.
               </div>
             ) : (
-              <div className="border border-gray-200 rounded-md overflow-hidden">
-                <table className="w-full text-sm text-left">
+              <div className="w-full max-w-full overflow-x-auto border border-gray-200 rounded-md [-webkit-overflow-scrolling:touch]">
+                <table className="w-full min-w-150 text-sm text-left">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
                       <th className="px-4 py-3 font-semibold text-xs text-gray-500 uppercase">Date</th>
@@ -98,7 +98,7 @@ function PatientProfileModal({ patient, onClose, onCheckOut }: PatientProfileMod
                   <tbody className="divide-y divide-gray-100">
                     {visits.map((v, idx) => (
                       <tr key={v._id || idx} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 text-black font-medium">{new Date(v.date).toLocaleDateString()}</td>
+                        <td className="px-4 py-3 text-black font-medium whitespace-nowrap">{new Date(v.date).toLocaleDateString()}</td>
                         <td className="px-4 py-3">
                           <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${v.status === 'Completed' ? 'bg-black text-white' : 'bg-gray-200 text-gray-700'}`}>
                             {v.status}
@@ -110,7 +110,7 @@ function PatientProfileModal({ patient, onClose, onCheckOut }: PatientProfileMod
                             <span>{v.bodyTemperature || v.vitals?.bodyTemperature || '—'}</span>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-gray-900 font-medium text-right text-xs">
+                        <td className="px-4 py-3 text-gray-900 font-medium text-right text-xs whitespace-nowrap">
                           {v.paymentAmount || (v.payment && v.payment.amount)
                             ? `${(v.paymentAmount || v.payment?.amount || 0).toLocaleString()} MMK (${v.paymentType || v.payment?.type || 'Cash'})` 
                             : '—'}
