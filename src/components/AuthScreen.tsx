@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { HeartPulse, Loader2, ShieldCheck } from 'lucide-react';
+import { HeartPulse, Loader2, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../lib/api';
 
@@ -8,6 +8,7 @@ export default function AuthScreen() {
   const [form, setForm] = useState({ username: '', phone: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   
   const { login } = useAuth();
 
@@ -81,8 +82,9 @@ export default function AuthScreen() {
             <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
             <input 
               required 
+              type="tel"
               value={form.phone} 
-              onChange={(e) => setForm({ ...form, phone: e.target.value })} 
+              onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, '') })} 
               className="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:border-black focus:ring-1 focus:ring-black outline-none transition-all text-sm" 
               placeholder="09xxxxxxxxx" 
             />
@@ -90,14 +92,23 @@ export default function AuthScreen() {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input 
-              required 
-              type="password"
-              value={form.password} 
-              onChange={(e) => setForm({ ...form, password: e.target.value })} 
-              className="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:border-black focus:ring-1 focus:ring-black outline-none transition-all text-sm" 
-              placeholder="••••••••" 
-            />
+            <div className="relative">
+              <input 
+                required 
+                type={showPassword ? "text" : "password"}
+                value={form.password} 
+                onChange={(e) => setForm({ ...form, password: e.target.value })} 
+                className="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:border-black focus:ring-1 focus:ring-black outline-none transition-all text-sm pr-10" 
+                placeholder="••••••••" 
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
           
           <button 

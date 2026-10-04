@@ -15,6 +15,26 @@ import {
 import * as htmlToImage from 'html-to-image';
 import { jsPDF } from 'jspdf';
 
+// --- React Native WebView bridge typing ---
+declare global {
+  interface Window {
+    ReactNativeWebView?: {
+      postMessage: (message: string) => void;
+    };
+  }
+}
+
+// Convert a Blob into a raw Base64 string (without the "data:...;base64," prefix)
+const blobToBase64 = (blob: Blob): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result as string;
+      resolve(result.substring(result.indexOf(',') + 1));
+    };
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
 
 
 // Helper to format Date to YYYY-MM-DD for input value
@@ -169,7 +189,22 @@ export default function Reports() {
       const pdfHeight = (element.offsetHeight * pdfWidth) / element.offsetWidth;
       
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Clinic_Report_${selectedDate}.pdf`);
+
+      const filename = `Clinic_Report_${selectedDate}.pdf`;
+
+      // 3. Deliver the PDF
+      if (window.ReactNativeWebView) {
+        // Inside React Native WebView: browser downloads don't work,
+        // so hand the file over to the native side as Base64.
+        const pdfBlob: Blob = pdf.output('blob');
+        const base64Data = await blobToBase64(pdfBlob);
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({ type: 'DOWNLOAD_PDF', base64: base64Data, filename })
+        );
+      } else {
+        // Normal web browser download
+        pdf.save(filename);
+      }
     } catch (error: any) {
       console.error("EXACT_PDF_ERROR:", error);
       alert(`Error generating PDF: ${error?.message || error}\nPlease check the console for more details.`);
